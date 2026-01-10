@@ -51,6 +51,23 @@ func (cfg *apiConfig) createChirpHandler(w http.ResponseWriter, req *http.Reques
 	}
 }
 
+func (cfg *apiConfig) getChirpsHandler(w http.ResponseWriter, req *http.Request) {
+	sort := "created_at ASC"
+
+	rawChirps, err := cfg.db.GetChirps(req.Context(), sort)
+	if err != nil {
+		respondWithError(w, 500, fmt.Sprintf("Error retrieving chirps: %s", err))
+		return
+	}
+
+	var chirps []Chirp
+	for _, rawChirp := range rawChirps {
+		chirps = append(chirps, convertChirpForResponse(rawChirp))
+	}
+
+	respondWithJSON(w, 200, chirps)
+}
+
 func convertChirpForResponse(dbChirp database.Chirp) Chirp {
 	return Chirp{
 		ID:        dbChirp.ID,
