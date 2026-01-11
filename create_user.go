@@ -7,6 +7,7 @@ import (
 
 	"github.com/afleetingchance/Chirpy/internal/auth"
 	"github.com/afleetingchance/Chirpy/internal/database"
+	"github.com/afleetingchance/Chirpy/internal/types"
 )
 
 func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, req *http.Request) {
@@ -39,14 +40,5 @@ func (cfg *apiConfig) createUserHandler(w http.ResponseWriter, req *http.Request
 		return
 	}
 
-	respondWithJSON(w, 201, convertUserForResponse(user))
-}
-
-func convertUserForResponse(dbUser database.User) User {
-	return User{
-		ID:        dbUser.ID,
-		CreatedAt: dbUser.CreatedAt,
-		UpdatedAt: dbUser.UpdatedAt,
-		Email:     dbUser.Email,
-	}
+	respondWithJSON(w, 201, types.ConvertUserForResponse(user))
 }

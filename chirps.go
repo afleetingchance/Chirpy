@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/afleetingchance/Chirpy/internal/database"
+	"github.com/afleetingchance/Chirpy/internal/types"
 	"github.com/google/uuid"
 )
 
@@ -47,7 +48,7 @@ func (cfg *apiConfig) createChirpHandler(w http.ResponseWriter, req *http.Reques
 			respondWithError(w, 500, fmt.Sprintf("Error creating chirp: %s", err))
 		}
 
-		respondWithJSON(w, 201, convertChirpForResponse(chirp))
+		respondWithJSON(w, 201, types.ConvertChirpForResponse(chirp))
 	}
 }
 
@@ -60,9 +61,9 @@ func (cfg *apiConfig) getChirpsHandler(w http.ResponseWriter, req *http.Request)
 		return
 	}
 
-	var chirps []Chirp
+	var chirps []types.Chirp
 	for _, rawChirp := range rawChirps {
-		chirps = append(chirps, convertChirpForResponse(rawChirp))
+		chirps = append(chirps, types.ConvertChirpForResponse(rawChirp))
 	}
 
 	respondWithJSON(w, 200, chirps)
@@ -83,15 +84,5 @@ func (cfg *apiConfig) getChirpByIdHandler(w http.ResponseWriter, req *http.Reque
 		return
 	}
 
-	respondWithJSON(w, 200, convertChirpForResponse(rawChirp))
-}
-
-func convertChirpForResponse(dbChirp database.Chirp) Chirp {
-	return Chirp{
-		ID:        dbChirp.ID,
-		CreatedAt: dbChirp.CreatedAt,
-		UpdatedAt: dbChirp.UpdatedAt,
-		Body:      dbChirp.Body,
-		UserId:    dbChirp.UserID,
-	}
+	respondWithJSON(w, 200, types.ConvertChirpForResponse(rawChirp))
 }
