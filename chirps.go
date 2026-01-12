@@ -19,8 +19,7 @@ var badWords = map[string]struct{}{
 
 func (cfg *apiConfig) createChirpHandler(w http.ResponseWriter, req *http.Request) {
 	type parameters struct {
-		Body   string    `json:"body"`
-		UserId uuid.UUID `json:"user_id"`
+		Body string `json:"body"`
 	}
 
 	var params parameters
@@ -42,7 +41,7 @@ func (cfg *apiConfig) createChirpHandler(w http.ResponseWriter, req *http.Reques
 
 		chirp, err := cfg.db.CreateChirp(req.Context(), database.CreateChirpParams{
 			Body:   cleaned,
-			UserID: params.UserId,
+			UserID: req.Context().Value("user_id").(uuid.UUID),
 		})
 		if err != nil {
 			respondWithError(w, 500, fmt.Sprintf("Error creating chirp: %s", err))
