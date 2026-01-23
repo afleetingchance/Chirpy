@@ -48,11 +48,17 @@ func main() {
 	mux.HandleFunc("GET /api/healthz", healthHandler)
 	mux.HandleFunc("GET /admin/metrics", apiCfg.hitsHandler)
 	mux.HandleFunc("POST /admin/reset", apiCfg.resetHandler)
+
 	mux.HandleFunc("GET /api/chirps", apiCfg.getChirpsHandler)
 	mux.HandleFunc("GET /api/chirps/{chirpId}", apiCfg.getChirpByIdHandler)
 	mux.Handle("POST /api/chirps", apiCfg.middlewareAuthorization(http.HandlerFunc(apiCfg.createChirpHandler)))
+
 	mux.HandleFunc("POST /api/users", apiCfg.createUserHandler)
+	mux.Handle("PUT /api/users", apiCfg.middlewareAuthorization(http.HandlerFunc(apiCfg.updateUserHandler)))
 	mux.HandleFunc("POST /api/login", apiCfg.loginHandler)
+
+	mux.HandleFunc("POST /api/refresh", apiCfg.refreshTokenHandler)
+	mux.HandleFunc("POST /api/revoke", apiCfg.revokeTokenHandler)
 
 	server.ListenAndServe()
 }

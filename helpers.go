@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/afleetingchance/Chirpy/internal/auth"
 )
 
 func respondWithError(w http.ResponseWriter, code int, msg string) {
@@ -23,18 +21,4 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.WriteHeader(code)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(resBody)
-}
-
-func (cfg *apiConfig) apiAuthorization(req *http.Request) (bool, error) {
-	tokenString, err := auth.GetBearerToken(req.Header)
-	if err != nil {
-		return false, err
-	}
-
-	_, err = auth.ValidateJWT(tokenString, cfg.jwtSecret)
-	if err != nil {
-		return false, err
-	}
-
-	return true, nil
 }

@@ -29,7 +29,7 @@ func TestValidJWT(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			tokenString, err := MakeJWT(tc.userID, tc.tokenSecret, tc.expiresIn)
+			tokenString, err := MakeJWT(tc.userID, tc.tokenSecret)
 			if err != nil {
 				t.Fatalf("MakeJWT error: %v", err)
 			}
@@ -74,7 +74,7 @@ func TestInvalidJWT(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			tokenString, err := MakeJWT(tc.userID, tc.createTokenSecret, tc.expiresIn)
+			tokenString, err := MakeJWT(tc.userID, tc.createTokenSecret)
 			if err != nil {
 				t.Fatalf("MakeJWT error: %v", err)
 			}

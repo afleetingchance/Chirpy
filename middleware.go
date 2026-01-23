@@ -19,7 +19,7 @@ func (cfg *apiConfig) middlewareAuthorization(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tokenString, err := auth.GetBearerToken(r.Header)
 		if err != nil {
-			respondWithError(w, 500, fmt.Sprintf("Error getting authorization token: %s", err))
+			respondWithError(w, 401, fmt.Sprintf("Error getting authorization token: %s", err))
 			return
 		}
 
