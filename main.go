@@ -17,6 +17,7 @@ type apiConfig struct {
 	db             *database.Queries
 	platform       string
 	jwtSecret      string
+	polkaKey       string
 }
 
 func main() {
@@ -24,6 +25,7 @@ func main() {
 	dbURL := os.Getenv("DB_URL")
 	platform := os.Getenv("PLATFORM")
 	jwtSecret := os.Getenv("JWT_SECRET")
+	polkaKey := os.Getenv("POLKA_KEY")
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		fmt.Printf("Error connecting to database: %s\n", err)
@@ -34,6 +36,7 @@ func main() {
 		db:        database.New(db),
 		platform:  platform,
 		jwtSecret: jwtSecret,
+		polkaKey:  polkaKey,
 	}
 	mux := http.NewServeMux()
 
@@ -51,18 +54,18 @@ func main() {
 
 	mux.HandleFunc("GET /api/chirps", apiCfg.getChirpsHandler)
 	mux.HandleFunc("GET /api/chirps/{chirpId}", apiCfg.getChirpByIdHandler)
-	mux.Handle("POST /api/chirps", apiCfg.middlewareAuthorization(http.HandlerFunc(apiCfg.createChirpHandler)))
-	mux.Handle("DELETE /api/chirps/{chirpId}", apiCfg.middlewareAuthorization(http.HandlerFunc(apiCfg.deleteChirpHandler)))
+	mux.Handle("POST /api/chirps", apiCfg.middlewareUserAuth(http.HandlerFunc(apiCfg.createChirpHandler)))
+	mux.Handle("DELETE /api/chirps/{chirpId}", apiCfg.middlewareUserAuth(http.HandlerFunc(apiCfg.deleteChirpHandler)))
 
 	mux.HandleFunc("POST /api/users", apiCfg.createUserHandler)
-	mux.Handle("PUT /api/users", apiCfg.middlewareAuthorization(http.HandlerFunc(apiCfg.updateUserHandler)))
+	mux.Handle("PUT /api/users", apiCfg.middlewareUserAuth(http.HandlerFunc(apiCfg.updateUserHandler)))
 	mux.HandleFunc("POST /api/login", apiCfg.loginHandler)
 
 	mux.HandleFunc("POST /api/refresh", apiCfg.refreshTokenHandler)
 	mux.HandleFunc("POST /api/revoke", apiCfg.revokeTokenHandler)
 
 	// Webhooks
-	mux.HandleFunc("POST /api/polka/webhooks", apiCfg.polkaWebhookHandler)
+	mux.Handle("POST /api/polka/webhooks", apiCfg.middlewareAPIAuth(http.HandlerFunc(apiCfg.polkaWebhookHandler), "polkaKey"))
 
 	server.ListenAndServe()
 }
