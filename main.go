@@ -61,5 +61,8 @@ func main() {
 	mux.HandleFunc("POST /api/refresh", apiCfg.refreshTokenHandler)
 	mux.HandleFunc("POST /api/revoke", apiCfg.revokeTokenHandler)
 
+	// Webhooks
+	mux.HandleFunc("POST /api/polka/webhooks", apiCfg.polkaWebhookHandler)
+
 	server.ListenAndServe()
 }
