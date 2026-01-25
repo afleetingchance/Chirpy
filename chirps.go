@@ -52,9 +52,31 @@ func (cfg *apiConfig) createChirpHandler(w http.ResponseWriter, req *http.Reques
 }
 
 func (cfg *apiConfig) getChirpsHandler(w http.ResponseWriter, req *http.Request) {
-	sort := "created_at ASC"
+	sortParam := req.URL.Query().Get("sort")
+	sortDirection := "asc"
+	if sortParam != "" {
+		sortDirection = sortParam
+	}
+	sort := "created_at_" + sortDirection
 
-	rawChirps, err := cfg.db.GetChirps(req.Context(), sort)
+	userIdString := req.URL.Query().Get("author_id")
+	var userId uuid.UUID
+	if userIdString != "" {
+		var err error
+		userId, err = uuid.Parse(userIdString)
+		if err != nil {
+			respondWithError(w, 500, fmt.Sprintf("Error parsing user ID: %s", err))
+			return
+		}
+	}
+
+	rawChirps, err := cfg.db.GetChirps(
+		req.Context(),
+		database.GetChirpsParams{
+			Sort:   sort,
+			UserID: userId,
+		},
+	)
 	if err != nil {
 		respondWithError(w, 500, fmt.Sprintf("Error retrieving chirps: %s", err))
 		return

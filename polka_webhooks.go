@@ -36,7 +36,7 @@ func (cfg *apiConfig) polkaWebhookHandler(w http.ResponseWriter, req *http.Reque
 func (cfg *apiConfig) upgradeUser(w http.ResponseWriter, req *http.Request, userIdString string) {
 	userId, err := uuid.Parse(userIdString)
 	if err != nil {
-		respondWithError(w, 500, fmt.Sprintf("Error parsing chirp ID: %s", err))
+		respondWithError(w, 500, fmt.Sprintf("Error parsing user ID: %s", err))
 		return
 	}
 
